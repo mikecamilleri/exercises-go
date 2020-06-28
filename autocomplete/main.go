@@ -1,29 +1,71 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
+	"net/http"
 	"os"
+	"strconv"
 )
 
+// TODO: ideally these values should be read from a config file
+const (
+	limit  = 25
+	port   = 9000
+	source = "shakespeare-complete.txt"
+)
+
+// a global variable is a cheap and easy way to make the trie accessable to an
+// httpHandler function
+var db *Trie
+
 func main() {
-	fmt.Println("Hello World!")
-	fmt.Println("extracting words from file and building trie ...")
+	log.Println("Hello World!")
+	log.Println("extracting words from file and building database in memory ...")
 
 	// initialize the db
-	db := NewTrie()
+	db = NewTrie()
 
 	// extract the words from the file and insert into the db
 	wordChan := make(chan string, 124)
-	go ExtractWordsFromFile("shakespeare-complete.txt", wordChan)
+	go ExtractWordsFromFile(source, wordChan)
 	for word := range wordChan {
 		if err := db.Insert(word); err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 
-	// test autocomplete
-	fmt.Println(db.Autocomplete("th", 1))
+	// start http server
+	log.Println("starting http server ...")
+	http.HandleFunc("/autocomplete", autocomplete)
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), nil))
 
-	fmt.Println("Success! Goodbye World!")
 	os.Exit(0)
+}
+
+func autocomplete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	query := r.URL.Query()
+	term := query.Get("term")
+	log.Println("Term: " + term)
+	results := db.Autocomplete(term, limit)
+	log.Printf("Results: %v", results)
+
+	type response struct {
+		Completions []string
+	}
+	respBytes, err := json.Marshal(response{Completions: results})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Response Bytes: %v", respBytes)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(respBytes)
 }
