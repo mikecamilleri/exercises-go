@@ -1,7 +1,4 @@
-// Package wordextractor ...
-//
-// An althernative way to implement this would be an iterator.
-package wordextractor
+package main
 
 import (
 	"bufio"
@@ -11,11 +8,15 @@ import (
 )
 
 // ExtractWordsFromFile ...
-func ExtractWordsFromFile(path string, wordChan chan<- string) error {
+func ExtractWordsFromFile(path string, wordChan chan<- string) {
+	// defer letting caller know when we are done by closing the channel
+	defer close(wordChan)
+
 	// open the file and defer close
 	file, err := os.Open(path)
 	if err != nil {
-		return err
+		// improve error handling
+		return
 	}
 	defer file.Close()
 
@@ -42,14 +43,14 @@ func ExtractWordsFromFile(path string, wordChan chan<- string) error {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		// TODO: error handlig should be improved
-		return err
+		// improve error handling
+		return
 	}
 
-	return nil
+	return
 }
 
-// cleanWord removes non-alphabet characters from the beginning and and of the
+// cleanWord removes non-alphabet characters from the beginning and end of the
 // word and ensures that the word only contains alphabet letters, hyphens, and
 // apostrophies internally.
 func cleanWord(word string) string {

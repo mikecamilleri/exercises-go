@@ -1,4 +1,4 @@
-package trie
+package main
 
 import (
 	"errors"
@@ -28,7 +28,7 @@ type Node struct {
 
 // NewTrie creates a new empty Trie.
 func NewTrie() *Trie {
-	return &Trie{}
+	return &Trie{root: &Node{}}
 }
 
 // Insert inserts a new word into the Trie.
@@ -85,35 +85,39 @@ func (t *Trie) Autocomplete(wordFragment string, limit int) []string {
 		node = node.children[v]
 	}
 
-	// we are at the node representing the last rune in wordFragment
+	// we are now at the node representing the last rune in wordFragment
 
 	// a slice of words and counts
 	type result struct {
 		word  string
 		count uint
 	}
-	results := []result{}
+	results := &[]result{}
 
 	// recursively complete the word fragment using an anonymous function
 	// variable declared first so that it may be used in the anonymous function
-	var recComplete func(wordFragment string, node *Node, results []result, limit int)
-	recComplete = func(wordFragment string, node *Node, results []result, limit int) {
-		// if we are at a word end, inert the word into our results
-		if node.wordCount >= 0 {
-
+	var recComplete func(wordFragment string, node *Node, results *[]result, limit int)
+	recComplete = func(wordFragment string, node *Node, results *[]result, limit int) {
+		// if we are at a word end, insert the word into our results
+		if node.wordCount > 0 {
 			// find insertion point
 			var i int
-			for i = 0; i < len(results); i++ {
-				if node.wordCount > results[i].count {
+			for i = 0; i < len(*results); i++ {
+				if node.wordCount > (*results)[i].count {
 					break
 				}
 			}
 
-			// insert (there is probably a better way to do this)
 			var tempResults []result
-			tempResults = append(tempResults, results[0:i]...)
-			tempResults = append(tempResults, result{word: wordFragment, count: node.wordCount})
-			tempResults = append(tempResults, results[i:]...)
+
+			// append if last item
+			if i == len(*results)-1 {
+				tempResults = append(*results, result{word: wordFragment, count: node.wordCount})
+			} else { // insert (there is probably a better way to do this)
+				tempResults = append(tempResults, (*results)[0:i]...)
+				tempResults = append(tempResults, result{word: wordFragment, count: node.wordCount})
+				tempResults = append(tempResults, (*results)[i:]...)
+			}
 
 			// trim
 			if len(tempResults) > limit {
@@ -121,7 +125,7 @@ func (t *Trie) Autocomplete(wordFragment string, limit int) []string {
 			}
 
 			// done
-			results = tempResults
+			*results = tempResults
 		}
 
 		// if there are any children, handle them recursively
@@ -136,10 +140,9 @@ func (t *Trie) Autocomplete(wordFragment string, limit int) []string {
 
 	// create a slice of strings and return
 	var ret []string
-	for _, v := range results {
+	for _, v := range *results {
 		ret = append(ret, v.word)
 	}
-
 	return ret
 }
 
