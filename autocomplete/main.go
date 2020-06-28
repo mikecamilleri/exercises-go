@@ -36,7 +36,7 @@ func main() {
 	}
 
 	// start http server
-	log.Println("starting http server ...")
+	log.Printf("listening on port %d ...", port)
 	http.HandleFunc("/autocomplete", autocomplete)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), nil))
 
@@ -51,9 +51,7 @@ func autocomplete(w http.ResponseWriter, r *http.Request) {
 
 	query := r.URL.Query()
 	term := query.Get("term")
-	log.Println("Term: " + term)
 	results := db.Autocomplete(term, limit)
-	log.Printf("Results: %v", results)
 
 	type response struct {
 		Completions []string
@@ -63,7 +61,6 @@ func autocomplete(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Printf("Response Bytes: %v", respBytes)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
