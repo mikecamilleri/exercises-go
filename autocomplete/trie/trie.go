@@ -64,7 +64,7 @@ func (t *Trie) Insert(word string) error {
 
 // Autocomplete returns a slice of autocomplete suggestions sorted from most
 // to least frequent. An empty slice indicates that no suggestions were found.
-func (t *Trie) Autocomplete(wordFragment string) []string {
+func (t *Trie) Autocomplete(wordFragment string, limit int) []string {
 	// validate and make lower case
 	if !isValidWord(wordFragment) {
 		// alternatively we could return an error here, but I think that not
@@ -94,26 +94,53 @@ func (t *Trie) Autocomplete(wordFragment string) []string {
 	}
 	results := []result{}
 
-	// recursively complete the word fragment using anonymous function
+	// recursively complete the word fragment using an anonymous function
 	// variable declared first so that it may be used in the anonymous function
-	var recComplete func(wordFragment string, node *Node, results []result)
-	recComplete = func(wordFragment string, node *Node, results []result) {
-		// if we are at a word end, add the word to our results
+	var recComplete func(wordFragment string, node *Node, results []result, limit int)
+	recComplete = func(wordFragment string, node *Node, results []result, limit int) {
+		// if we are at a word end, inert the word into our results
 		if node.wordCount >= 0 {
-			results = append(results, result{word: wordFragment, count: node.wordCount})
+
+			// find insertion point
+			var i int
+			for i = 0; i < len(results); i++ {
+				if node.wordCount > results[i].count {
+					break
+				}
+			}
+
+			// insert (there is probably a better way to do this)
+			var tempResults []result
+			tempResults = append(tempResults, results[0:i]...)
+			tempResults = append(tempResults, result{word: wordFragment, count: node.wordCount})
+			tempResults = append(tempResults, results[i:]...)
+
+			// trim
+			if len(tempResults) > limit {
+				tempResults = tempResults[0:limit]
+			}
+
+			// done
+			results = tempResults
 		}
 
-		// if there are any children, handle them recursively,\
+		// if there are any children, handle them recursively
 		for k, v := range node.children {
 			var nextWordFragment strings.Builder
 			nextWordFragment.WriteString(wordFragment)
 			nextWordFragment.WriteRune(k)
-			recComplete(nextWordFragment.String(), v, results)
+			recComplete(nextWordFragment.String(), v, results, limit)
 		}
 	}
-	recComplete(wordFragment, node, results)
+	recComplete(wordFragment, node, results, limit)
 
-	return nil
+	// create a slice of strings and return
+	var ret []string
+	for _, v := range results {
+		ret = append(ret, v.word)
+	}
+
+	return ret
 }
 
 // isValidWord ...
