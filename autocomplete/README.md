@@ -27,11 +27,11 @@ This web service consists of three main parts:
 
 ### 1. The Datastore
 
-The words and their counts are stored in memory in a "trie" data structure. I thought that a tree data structure would be a relatively straightforward and very fast way to store the words and values, so I did a quick Google search which turned up the Wikipedia page for [trie](https://en.wikipedia.org/wiki/Trie) which I used as reference. I decided to mark the end of words (and store their count) in the tree using a `wordCount` field on the node.  
+The words and their counts are stored in memory in a "trie" data structure. I thought that a tree data structure would be a relatively straightforward and very fast way to store the words and values, so I did a quick Google search which turned up the [Wikipedia page for trie](https://en.wikipedia.org/wiki/Trie) which I used as reference. I decided to mark the end of words (and store their count) in the tree using a `wordCount` field on the node.  
 
 ### 2. The Word Extractor
 
-The word extractor is run as a goroutine and emits words on a channel. Words are extracted from a plain text file by first using "scanning" the file for words (whitespace delimited), each word is then "cleaned" and finally sent out on the channel. I had to make some decisions regarding what a "word" is, which are described in the comments. With more work, the extraction and cleaning could likely be made more efficient.
+The word extractor is run as a goroutine and emits words on a channel. Words are extracted from a plaintext file by first "scanning" the file for words (whitespace delimited), each word is then "cleaned" and finally sent out on the channel. I had to make some decisions regarding what a "word" is, which are described in the comments. With more work, the extraction and cleaning could likely be made more efficient.
 
 ### 3. The HTTP API
 
