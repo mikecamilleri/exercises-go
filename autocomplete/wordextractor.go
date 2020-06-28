@@ -9,7 +9,7 @@ import (
 
 // ExtractWordsFromFile extracts words from a text file.
 //
-// Words are emitted on wordChan. A wrod is defined as a string of characters
+// Words are emitted on wordChan. A word is defined as a string of characters
 // containing only letters, hyphens, and apostrophies. Words may not begin or
 // end with a non-letter character and may not have two of the same non-letter
 // characters in a row.

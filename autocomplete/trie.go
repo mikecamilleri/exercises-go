@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	// ErrInvalidWord is returned when a word value passed is invalid
+	// ErrInvalidWord is returned when a word value passed is invalid.
 	ErrInvalidWord = errors.New("invalid word")
 )
 
@@ -63,7 +63,9 @@ func (t *Trie) Insert(word string) error {
 }
 
 // Autocomplete returns a slice of autocomplete suggestions sorted from most
-// to least frequent. An empty slice indicates that no suggestions were found.
+// to least frequent and returns a slice.
+//
+// An empty slice indicates that no suggestions were found.
 func (t *Trie) Autocomplete(wordFragment string, limit int) []string {
 	// validate and make lower case
 	if !isValidWord(wordFragment) {
@@ -146,9 +148,11 @@ func (t *Trie) Autocomplete(wordFragment string, limit int) []string {
 	return ret
 }
 
-// isValidWord ...
+// isValidWord validates a word. A word is defined as a string of characters
+// containing only letters, hyphens, and apostrophies. Words may not have two
+// of the same non-letter characters in a row.
 func isValidWord(word string) bool {
-	// word length is greatter than zero
+	// word length is greater than zero
 	if len(word) == 0 {
 		return false
 	}
