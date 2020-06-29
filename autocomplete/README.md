@@ -23,7 +23,7 @@ By default the service runs on port `9000`. To request autocompletions, a `GET` 
 
 Throughout my development of this web service, the [offical Go docs](https://golang.org/doc/) and [this intro book](https://www.golang-book.com/books/intro) were used as references.
 
-This web service consists of three main parts:
+See comments in the code for more detail. This web service consists of three main parts:
 
 ### 1. The Datastore
 
