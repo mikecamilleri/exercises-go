@@ -11,16 +11,17 @@ import (
 func fizzerBuzzer(n int) string {
 	f := (n%3 == 0)
 	b := (n%5 == 0)
-	if f && b {
+
+	switch {
+	case f && b:
 		return "FizzBuzz"
-	}
-	if f {
+	case f:
 		return "Fizz"
-	}
-	if b {
+	case b:
 		return "Buzz"
+	default:
+		return ""
 	}
-	return ""
 }
 
 func main() {
