@@ -1,0 +1,5 @@
+{
+    "dbPath": ":memory:",
+    "apiBasePath": "/api/v0",
+    "apiPort": "8080"
+}
