@@ -24,6 +24,9 @@ func fizzerBuzzer(n int) string {
 	}
 }
 
+// Time complexity: O(n) linear because it prints a line for each number.
+// To perform the calculation for one n is O(1) constant.
+// Memory complexity: O(1)
 func main() {
 	for i := 0; i <= 100; i++ {
 		fmt.Printf("%d: %s\n", i, fizzerBuzzer(i))

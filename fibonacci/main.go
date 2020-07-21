@@ -7,7 +7,8 @@ import "fmt"
 // f(n) == f(n-1) + f(n-2)
 
 // FibR recursively calculates and returns the nth Fibonacci number.
-// O(2^n)
+// Time complexity: O(2^n) exponential
+// Memory complexity: O(n) linear
 func fibR(n int) int {
 	if n <= 1 {
 		return n
@@ -16,7 +17,8 @@ func fibR(n int) int {
 }
 
 // FibI iteratively calculates and returns the nth Fibonacci number.
-// O(n)
+// Time complexity: O(n) linear
+// Memory complexity: O(1) constant
 func fibI(n int) int {
 	ppn := 0 // previous previous number
 	pn := 0  // previous number
@@ -34,7 +36,7 @@ func fibI(n int) int {
 
 func main() {
 	fmt.Printf("Fib(n) = recursive = iterative\n")
-	for i := 0; i <= 10; i++ {
+	for i := 0; i <= 20; i++ {
 		fmt.Printf("Fib(%d) = %d = %d\n", i, fibR(i), fibI(i))
 	}
 }
