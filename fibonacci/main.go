@@ -20,17 +20,30 @@ func fibR(n int) int {
 // Time complexity: O(n) linear
 // Memory complexity: O(1) constant
 func fibI(n int) int {
-	ppn := 0 // previous previous number
-	pn := 0  // previous number
-	cn := 1  // current number
-	if n == 0 {
-		return 0
+	// error condition (could also use uint in signature)
+	if n < 0 {
+		return -1
 	}
-	for i := 1; i < n; i++ {
+
+	// base cases
+	if n < 2 {
+		return n
+	}
+
+	ppn := 0 // previous previous number
+	pn := 1  // previous number
+	cn := 0  // current number
+
+	// note the unusual `<=` here. I think this makes more sense than starting
+	// `i` at `1`.
+	for i := 2; i <= n; i++ {
+		// calculate the new current number
+		cn = ppn + pn
+		// prep for next ireration by moving values
 		ppn = pn
 		pn = cn
-		cn = ppn + pn
 	}
+
 	return cn
 }
 
